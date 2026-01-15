@@ -1,0 +1,7 @@
+{
+  "name": "LingoPal: Language Partner",
+  "description": "A voice-first AI partner for learning languages with real-time feedback, transliteration, and cultural notes.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

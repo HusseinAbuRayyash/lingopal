@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="https://picsum.photos/32/32" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LingoPal: Language Partner</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#0F766E', // Ocean Teal (Deep)
+                hover: '#115E59',   // Teal 800
+                soft: '#F0FDFA',    // Teal 50
+                light: '#CCFBF1',   // Teal 100
+                glow: '#5EEAD4',    // Teal 300
+              },
+              secondary: {
+                DEFAULT: '#D97706', // Desert Gold
+                hover: '#B45309',   // Amber 700
+                soft: '#FFFBEB',    // Amber 50
+              },
+              surface: {
+                DEFAULT: '#FFFFFF',
+                background: '#FAFAF9', // Alabaster/Sand
+                glass: 'rgba(255, 255, 255, 0.6)',
+              },
+              text: {
+                strong: '#1C1917', // Stone 900
+                main: '#44403C',   // Stone 700
+                soft: '#78716C',   // Stone 500
+                muted: '#A8A29E',  // Stone 400
+              }
+            },
+            fontFamily: {
+              sans: ['Outfit', 'sans-serif'],
+              arabic: ['Cairo', 'sans-serif'],
+              serif: ['Playfair Display', 'serif'],
+            },
+            boxShadow: {
+              'soft': '0 4px 30px -4px rgba(0, 0, 0, 0.05)',
+              'glow': '0 0 20px rgba(94, 234, 212, 0.5)',
+              'gem': 'inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 8px 20px -4px rgba(13, 148, 136, 0.4)',
+              'card': '0 0 0 1px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.03)',
+              'convex': 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.05)',
+              'debossed': 'inset 0 2px 4px rgba(0,0,0,0.05)',
+              'caustic': 'inset 0 2px 4px rgba(255, 255, 255, 0.4)',
+            },
+            animation: {
+              'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 8s ease-in-out infinite',
+              'breathe': 'breathe 5s ease-in-out infinite',
+              'wave': 'wave 2.5s ease-in-out infinite',
+              'wave-bar': 'waveBar 1s ease-in-out infinite',
+              'rise': 'rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+            },
+            keyframes: {
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(15px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              rise: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-15px)' },
+              },
+              breathe: {
+                '0%, 100%': { transform: 'scale(1)', opacity: '0.4' },
+                '50%': { transform: 'scale(1.1)', opacity: '0.6' },
+              },
+              wave: {
+                '0%, 100%': { transform: 'rotate(0deg)' },
+                '25%': { transform: 'rotate(-10deg)' },
+                '75%': { transform: 'rotate(10deg)' },
+              },
+              waveBar: {
+                 '0%, 100%': { height: '20%' },
+                 '50%': { height: '100%' }
+              }
+            },
+            backgroundImage: {
+               'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        .noise-bg {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "vite": "https://aistudiocdn.com/vite@^7.2.7",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
+    "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^3.4.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-surface-background text-text-main antialiased selection:bg-primary-light selection:text-primary-hover overflow-hidden">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
