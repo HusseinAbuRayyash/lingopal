@@ -1,20 +1,30 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# LingoPal
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/1hIA_ELNRJKI1MJzAKFJ_gtbVmPbnk9ia
+Voice-first AI language partner with real-time feedback, vocabulary highlights, and pronunciation support.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:** Node.js
 
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. (Optional) Set `VITE_GEMINI_API_KEY` in `.env.local` for a shared key
 3. Run the app:
    `npm run dev`
+
+## Deploy (Free)
+
+### Vercel (Recommended)
+1. Push this repo to GitHub.
+2. Go to https://vercel.com and import the repo.
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. **Do not set** `VITE_GEMINI_API_KEY` if you want users to bring their own key.
+
+### Netlify
+1. Push this repo to GitHub.
+2. Go to https://app.netlify.com and import the repo.
+3. Build command: `npm run build`
+4. Publish directory: `dist`
+5. **Do not set** `VITE_GEMINI_API_KEY` if you want users to bring their own key.
