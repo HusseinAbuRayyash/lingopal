@@ -1,5 +1,4 @@
-import React from 'react';
-import { AppSettings, AVAILABLE_VOICES, AVAILABLE_LANGUAGES, AVAILABLE_GOALS, AVAILABLE_ACCENTS, TargetLanguage } from '../types';
+import { AppSettings, AVAILABLE_VOICES, AVAILABLE_LANGUAGES, AVAILABLE_GOALS, AVAILABLE_ACCENTS } from '../types';
 import { X, Volume2, Zap, Check, Globe, KeyRound } from 'lucide-react';
 
 interface SettingsModalProps {

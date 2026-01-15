@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Message, VocabularyItem } from '../types';
-import { Play, Pause, Bot, BookOpen, X, Copy, Sparkles, Volume2 } from 'lucide-react';
+import { Play, Pause, Bot, X, Copy, Sparkles, Volume2 } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface ChatMessageProps {

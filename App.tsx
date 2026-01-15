@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Message, AppSettings, Sender, AIResponseData } from './types';
 import { analyzeAudioAndRespond, generateSpeech } from './services/gemini';
 import { decodeAudioData } from './utils/audio';

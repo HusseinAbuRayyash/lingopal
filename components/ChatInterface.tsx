@@ -1,7 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Message } from '../types';
 import ChatMessage from './ChatMessage';
-import { Loader2, Mic } from 'lucide-react';
 
 interface ChatInterfaceProps {
   messages: Message[];

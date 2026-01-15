@@ -246,7 +246,7 @@ export async function generateSpeech(
   }
 }
 
-export async function generateImageForTerm(term: string, meaning: string): Promise<string | null> {
+export async function generateImageForTerm(term: string, _meaning: string): Promise<string | null> {
   try {
     // Placeholder to reduce latency/cost for this demo.
     return `https://picsum.photos/seed/${encodeURIComponent(term)}/200`;

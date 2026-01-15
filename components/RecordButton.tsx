@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mic, Square } from 'lucide-react';
 import { twMerge } from 'tailwind-merge';
 
@@ -19,7 +18,6 @@ const RecordButton: React.FC<RecordButtonProps> = ({
 }) => {
   // Reactive Visualizer
   const glowScale = isRecording ? 1 + (volumeLevel * 0.5) : 1;
-  const pulseOpacity = isRecording ? 0.3 + (volumeLevel * 0.4) : 0;
 
   return (
     <div className="flex flex-col items-center gap-5 sm:gap-6 relative group">
