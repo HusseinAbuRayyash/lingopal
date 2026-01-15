@@ -141,7 +141,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
             
             {message.audioUrl && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap justify-end">
                 <button 
                   onClick={handlePlayToggle}
                   className={clsx(

@@ -22,14 +22,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
       onClick={onClose}
     >
       <div 
-        className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 border border-white/40 ring-1 ring-white/50 cursor-auto flex flex-col max-h-[85vh]"
+        className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 border border-white/40 ring-1 ring-white/50 cursor-auto flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex-none flex items-center justify-between p-8 pb-6 border-b border-stone-100/50 bg-white/50">
+        <div className="flex-none flex items-center justify-between p-6 sm:p-8 pb-4 sm:pb-6 border-b border-stone-100/50 bg-white/50">
           <div>
-            <h2 className="text-2xl font-bold text-text-strong tracking-tight">Preferences</h2>
-            <p className="text-sm text-text-soft font-medium">Personalize your tutor</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-text-strong tracking-tight">Preferences</h2>
+            <p className="text-xs sm:text-sm text-text-soft font-medium">Personalize your tutor</p>
           </div>
           <button 
             onClick={onClose} 
@@ -41,7 +41,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
         </div>
         
         {/* Scrollable Content */}
-        <div className="flex-1 p-8 space-y-10 bg-surface-background/30 overflow-y-auto">
+        <div className="flex-1 p-6 sm:p-8 space-y-8 sm:space-y-10 bg-surface-background/30 overflow-y-auto">
           
           {/* Language Selection */}
           <div className="space-y-4">

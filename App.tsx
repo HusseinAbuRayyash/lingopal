@@ -581,7 +581,7 @@ function App() {
       </div>
       
       {/* Floating Glass Header */}
-      <header className="flex-none absolute top-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
+      <header className="flex-none absolute top-[calc(env(safe-area-inset-top)+0.5rem)] sm:top-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
         <div className="pointer-events-auto flex items-center justify-between gap-4 px-3 py-2 rounded-full bg-white/50 backdrop-blur-xl shadow-soft border border-white/60 w-[90%] max-w-lg transition-all hover:bg-white/70 hover:shadow-md">
           
           {/* Logo Badge */}
@@ -653,7 +653,7 @@ function App() {
       </main>
 
       {/* Floating Action / Record Area - Gradient Anchoring */}
-      <div className="flex-none z-20 pointer-events-none absolute bottom-0 left-0 right-0 pb-8 pt-24 bg-gradient-to-t from-surface-background via-surface-background/80 to-transparent">
+      <div className="flex-none z-20 pointer-events-none absolute bottom-0 left-0 right-0 pb-[calc(env(safe-area-inset-bottom)+2rem)] sm:pb-8 pt-20 sm:pt-24 bg-gradient-to-t from-surface-background via-surface-background/80 to-transparent">
         <div className="max-w-md mx-auto flex justify-center pointer-events-auto">
            <RecordButton 
              isRecording={isRecording} 
