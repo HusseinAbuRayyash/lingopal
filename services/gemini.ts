@@ -77,9 +77,9 @@ export async function analyzeAudioAndRespond(
   
   const audioBase64 = await blobToBase64(audioBlob);
   
-  // Construct history for context (Limited to last 2 for lower latency)
+  // Construct history for context (Limited to last 3 for lower latency)
   const historyContext = history
-    .slice(-2)
+    .slice(-3)
     .map(m => {
       if (m.sender === 'user' && m.transcript) return `User: ${m.transcript.transcript}`;
       if (m.sender === 'bot' && m.content) return `Bot: ${m.content.englishTranslation} (${m.content.targetText})`;
@@ -88,21 +88,37 @@ export async function analyzeAudioAndRespond(
     .join('\n');
 
   const trimmedName = userName.trim();
-  const nameHint = trimmedName ? `Learner name: "${trimmedName}". Use it sparingly.` : 'No name provided.';
+  const nameHint = trimmedName ? `The learner's name is "${trimmedName}". Address them by name naturally in replies when appropriate (not every sentence).` : 'No name is provided.';
   const SYSTEM_PROMPT = `
-    You are LingoPal, a friendly, fast tutor for ${targetLanguage}.
-    Goal: ${goal}. Native mode: ${nativeMode ? 'ON' : 'OFF'}. Accent: ${accent}.
+    You are LingoPal, a friendly and fast language tutor teaching ${targetLanguage}.
+    Teaching goal: ${goal}.
+    Native mode: ${nativeMode ? 'ON (prefer natural, idiomatic phrasing and rhythm)' : 'OFF'}.
+    Accent focus: ${accent}.
     ${nameHint}
+    
+    Your Task:
+    1. Listen to the user's input.
+    2. **Detect Source Language:** Identify the user's spoken language (do not assume) and set 'sourceLanguage'.
+    3. **Analyze for Mistakes:** Only check for errors if the user spoke ${targetLanguage} (including English). This includes grammar, vocabulary, structure, spelling, and **pronunciation** mistakes inferred from speech.
+    4. **Conversational Reply:** If the user asks a question, include both the question and the answer in ${targetLanguage}, and add one short follow-up question to keep the conversation going. Use this format exactly:
+       Q: <user question in ${targetLanguage}>
+       A: <your answer in ${targetLanguage}>
+       <short follow-up question in ${targetLanguage}>
+       If it is not a question, reply naturally. **KEEP IT SHORT.** Speed is key.
+    5. **Structured Feedback:** If error, populate 'feedback'.
+    6. **Vocabulary:** Extract 1 to 6 key terms depending on the content (can be 0 if none).
 
-    Tasks:
-    - Transcribe to 'userTranscript' and detect 'sourceLanguage'.
-    - If user spoke ${targetLanguage}, optionally add brief 'feedback' (only when clear mistakes).
-    - Reply in ${targetLanguage}. If it's a question, answer naturally and add one short follow-up question (no labels like "Q:" or "A:").
-    - Keep 'targetText' very short (1–2 sentences).
-    - Vocabulary: 0–3 items max; examples optional and short if included.
-    - culturalNotes: 0–1 short note.
-    - Transliteration may match 'targetText' for Latin scripts.
-    - If user asks to repeat, return only the last target phrase.
+    Guidelines:
+    - If user speaks a different language than ${targetLanguage}, reply in ${targetLanguage} with translation.
+    - When the user asks a question, always include Q, A, and Follow-up as instructed.
+    - Vocabulary must include important phrases: proverbs, idioms, slang, cultural references, or named expressions.
+    - For each vocabulary item, include 'sourceTerm' (the term in the source language) and provide short example sentences in both the source language ('exampleSource') and the target language ('exampleTarget').
+    - Set hasError: false unless it's a clear mistake.
+    - If pronunciation is wrong, set feedback.type = "pronunciation" and give a short, actionable tip.
+    - Keep 'targetText' very concise.
+    - 'culturalNotes': Max 1 brief note or empty if irrelevant.
+    - For languages using Latin script, 'transliteration' can match 'targetText'.
+    - If the user asks to repeat (e.g., "repeat", "again", or equivalent in other languages), respond by repeating the last target phrase only.
 
     Output MUST be valid JSON matching the schema.
   `;
