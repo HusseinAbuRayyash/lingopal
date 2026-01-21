@@ -37,6 +37,7 @@ function App() {
     }
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [apiKeyInvalid, setApiKeyInvalid] = useState(false);
   const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
   const [audioUnlockRequired, setAudioUnlockRequired] = useState(false);
@@ -123,6 +124,11 @@ function App() {
     settingsRef.current = settings;
   }, [settings]);
   useEffect(() => {
+    if (settings.apiKey.trim()) {
+      setApiKeyInvalid(false);
+    }
+  }, [settings.apiKey]);
+  useEffect(() => {
     isRecordingRef.current = isRecording;
   }, [isRecording]);
   useEffect(() => {
@@ -139,7 +145,7 @@ function App() {
     import.meta.env.VITE_GEMINI_API_KEY ||
     import.meta.env.VITE_API_KEY;
   const apiKey = settings.apiKey.trim() || envApiKey;
-  const apiKeyMissing = !apiKey;
+  const apiKeyMissing = !apiKey || apiKeyInvalid;
 
   const ensureAudioContext = () => {
     if (!audioContextRef.current) {
@@ -194,6 +200,11 @@ function App() {
   };
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  const isApiKeyInvalid = (error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.includes("API_KEY_INVALID") || message.includes("API Key not found");
+  };
 
   const pickRecordingMimeType = () => {
     if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return null;
@@ -741,10 +752,18 @@ function App() {
         }
       } catch (ttsError) {
         console.error("TTS failed", ttsError);
+        if (isApiKeyInvalid(ttsError)) {
+          setApiKeyInvalid(true);
+          setIsSettingsOpen(true);
+        }
       }
 
     } catch (error) {
       console.error("Analysis failed", error);
+      if (isApiKeyInvalid(error)) {
+        setApiKeyInvalid(true);
+        setIsSettingsOpen(true);
+      }
       setIsLoading(false);
     }
   };
@@ -945,7 +964,9 @@ function App() {
         <div className="absolute top-20 left-0 right-0 z-20 flex justify-center px-4">
           <div className="pointer-events-auto flex items-center gap-3 bg-white/90 border border-red-100 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong">
             <AlertTriangle size={16} className="text-red-500" />
-            <span>Gemini API key required to start.</span>
+            <span>
+              {apiKeyInvalid ? "Gemini API key is invalid. Please update it." : "Gemini API key required to start."}
+            </span>
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="text-primary font-semibold hover:text-primary-hover"
