@@ -89,10 +89,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   if (!isBot) {
     return (
       <div className="flex justify-end mb-6 group animate-fade-in-up">
-        <div className="relative max-w-[90%] sm:max-w-[75%]">
-           <div className="bg-gradient-to-br from-primary to-teal-600 text-white rounded-2xl rounded-tr-sm px-4 sm:px-6 py-3 sm:py-4 shadow-md shadow-primary/10 border border-white/10 relative overflow-hidden transition-transform hover:scale-[1.01] duration-300">
+        <div className="relative max-w-[94%] sm:max-w-[75%]">
+           <div className="bg-gradient-to-br from-primary to-teal-600 text-white rounded-2xl rounded-tr-sm px-4 sm:px-6 py-3 sm:py-4 shadow-md shadow-primary/10 border border-white/10 relative overflow-hidden transition-transform hover:scale-[1.005] duration-300">
              {/* Subtle noise texture */}
-             <div className="absolute inset-0 opacity-5 bg-black mix-blend-overlay pointer-events-none"></div>
+             <div className="absolute inset-0 opacity-4 bg-black mix-blend-overlay pointer-events-none"></div>
              
              <p className="text-base sm:text-lg leading-relaxed font-sans font-medium relative z-10">{message.transcript?.transcript}</p>
              {/* Only show transliteration if it's available and not redundant */}
@@ -116,11 +116,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <div className="flex justify-start mb-8 animate-fade-in-up">
       {/* Container - Premium Glass Card */}
-      <div className="max-w-[96%] sm:max-w-[90%] w-full bg-white/90 backdrop-blur-md border border-stone-100 rounded-[2rem] rounded-tl-sm p-1 shadow-sm ring-1 ring-black/5 relative overflow-hidden group">
+      <div className="max-w-[98%] sm:max-w-[90%] w-full bg-surface-panel/95 backdrop-blur-md border border-stone-100/70 rounded-[2rem] rounded-tl-sm p-1 shadow-card ring-1 ring-black/5 relative overflow-hidden group">
         
         {/* Soft background ambient gradient */}
-        <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-radial from-amber-50/60 to-transparent opacity-60 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-gradient-radial from-primary/5 to-transparent opacity-60 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-radial from-amber-50/40 to-transparent opacity-50 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-gradient-radial from-primary/5 to-transparent opacity-45 pointer-events-none"></div>
 
         <div className="p-4 sm:p-8 relative z-10">
           {/* Header Row */}
@@ -134,7 +134,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                  <span className="block text-[10px] text-text-muted font-bold uppercase tracking-wider">AI Tutor</span>
                </div>
                {data.rephraseStyle && (
-                 <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border border-stone-200 bg-white/70 text-text-muted">
+                 <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full border border-stone-200/80 bg-surface-panel/90 text-text-muted">
                    Rephrase · {data.rephraseStyle}
                  </span>
                )}
@@ -148,7 +148,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     "relative flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shadow-sm hover:shadow-md active:scale-95",
                     isPlaying 
                       ? "bg-secondary text-white" 
-                      : "bg-white text-text-main border border-stone-200 hover:border-primary hover:text-primary"
+                      : "bg-surface-panel/90 text-text-main border border-stone-100/70 hover:border-primary/40 hover:text-primary"
                   )}
                   aria-label={isPlaying ? "Pause audio" : "Play audio"}
                 >
@@ -160,7 +160,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 </button>
                 <button
                   onClick={() => onPlaySlow(message.id)}
-                  className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full border border-stone-200 bg-white/80 text-text-muted hover:text-primary hover:border-primary/30 transition-colors"
+                  className="px-3 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full border border-stone-100/70 bg-surface-panel/90 text-text-muted hover:text-primary hover:border-primary/30 transition-colors"
                   aria-label="Play slow"
                 >
                   Slow
@@ -181,7 +181,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 )}
               >
                  <div className="flex items-start gap-3 relative z-10">
-                    <div className="p-1.5 bg-white rounded-lg mt-0.5 border border-white/60">
+                    <div className="p-1.5 bg-surface-panel/90 rounded-lg mt-0.5 border border-stone-100/70">
                       <Sparkles size={14} />
                     </div>
                     <div>
@@ -199,14 +199,14 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                         )}
                       </div>
                       <div className="grid gap-2">
-                        <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                        <div className="bg-surface-panel/90 rounded-xl p-3 border border-stone-100/70">
                           <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-1">Your phrase</span>
                           <p className={clsx("font-semibold", isRTL ? "font-arabic" : "font-sans")} dir={isRTL ? "rtl" : "ltr"}>
                             {data.userTranscript}
                           </p>
                         </div>
                         {data.feedback.correction && (
-                          <div className="bg-white/70 rounded-xl p-3 border border-white/80">
+                          <div className="bg-surface-panel/90 rounded-xl p-3 border border-stone-100/70">
                             <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-text-muted mb-1">Correct</span>
                             <p className={clsx("font-semibold", feedbackStyles[data.feedback.type || 'general'].text, isRTL ? "font-arabic" : "font-sans")} dir={isRTL ? "rtl" : "ltr"}>
                               {data.feedback.correction}
@@ -243,7 +243,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 <button
                   key={style}
                   onClick={() => onRephrase(message.id, style)}
-                  className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full border border-stone-200 bg-white/80 text-text-muted hover:text-primary hover:border-primary/30 transition-colors"
+                  className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full border border-stone-100/70 bg-surface-panel/90 text-text-muted hover:text-primary hover:border-primary/30 transition-colors"
                 >
                   Rephrase {style}
                 </button>
@@ -302,7 +302,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                         </button>
                         <button
                           onClick={() => onSpeakVocab(vocab.term)}
-                          className="ml-1 p-1.5 rounded-full bg-white/80 border border-white/70 text-text-muted hover:text-primary transition-colors"
+                          className="ml-1 p-1.5 rounded-full bg-surface-panel/85 border border-stone-100/70 text-text-muted hover:text-primary transition-colors"
                           aria-label="Play pronunciation"
                           title="Play pronunciation"
                         >
@@ -341,7 +341,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           onClick={() => setSelectedVocab(null)}
         >
           <div 
-            className="bg-white rounded-[2rem] shadow-2xl p-8 max-w-sm w-full animate-in zoom-in-95 duration-200 relative overflow-hidden border border-white/60 ring-1 ring-white" 
+            className="bg-surface-panel/95 rounded-[2rem] shadow-2xl p-8 max-w-sm w-full animate-in zoom-in-95 duration-200 relative overflow-hidden border border-stone-100/70 ring-1 ring-black/5" 
             onClick={e => e.stopPropagation()}
           >
             <button onClick={() => setSelectedVocab(null)} className="absolute top-4 right-4 p-2 text-stone-300 hover:text-stone-600 transition-colors">
@@ -354,15 +354,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                 <p className="text-lg text-secondary font-serif italic">{selectedVocab.vocab.transliteration}</p>
               )}
               
-              <div className="bg-stone-50 rounded-2xl p-5 border border-stone-100 mt-4">
+              <div className="bg-surface-panel/90 rounded-2xl p-5 border border-stone-100/70 mt-4">
                 <p className="font-bold text-text-main text-lg mb-2">{selectedVocab.vocab.meaning}</p>
-                <span className="inline-block px-2 py-1 bg-stone-200/50 rounded text-[10px] font-bold text-text-muted uppercase tracking-widest border border-stone-200">
+                <span className="inline-block px-2 py-1 bg-surface-panel/90 rounded text-[10px] font-bold text-text-muted uppercase tracking-widest border border-stone-100/70">
                   {selectedVocab.vocab.partOfSpeech}
                 </span>
               </div>
               <button
                 onClick={() => onSpeakVocab(selectedVocab.vocab.term)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stone-200 bg-white/80 text-text-muted hover:text-primary hover:border-primary/30 transition-colors text-xs font-bold uppercase tracking-widest"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-stone-100/70 bg-surface-panel/90 text-text-muted hover:text-primary hover:border-primary/30 transition-colors text-xs font-bold uppercase tracking-widest"
               >
                 <Volume2 size={14} />
                 Listen
@@ -371,7 +371,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
               {(selectedVocab.vocab.exampleSource || selectedVocab.vocab.exampleTarget) && (
                 <div className="space-y-3">
                   {selectedVocab.vocab.exampleSource && (
-                    <div className="bg-white rounded-2xl p-4 border border-stone-100 text-left">
+                    <div className="bg-surface-panel/90 rounded-2xl p-4 border border-stone-100/70 text-left">
                       <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-1">
                         Source Example
                       </span>
@@ -388,7 +388,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
                     </div>
                   )}
                   {selectedVocab.vocab.exampleTarget && (
-                    <div className="bg-white rounded-2xl p-4 border border-stone-100 text-left">
+                    <div className="bg-surface-panel/90 rounded-2xl p-4 border border-stone-100/70 text-left">
                       <span className="block text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-1">
                         Target Example
                       </span>

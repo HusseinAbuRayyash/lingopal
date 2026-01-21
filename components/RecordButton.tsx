@@ -38,7 +38,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({
          {/* Sharp Pulse Ring */}
         <div 
           className={twMerge(
-            "absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-white/50 transition-all duration-75 ease-linear",
+          "absolute w-20 h-20 sm:w-28 sm:h-28 rounded-full border border-white/50 transition-all duration-75 ease-linear",
             isRecording ? "opacity-100 border-rose-300" : "opacity-0"
           )}
            style={{ 
@@ -53,10 +53,10 @@ const RecordButton: React.FC<RecordButtonProps> = ({
         disabled={disabled}
         aria-label={isRecording ? "Stop recording" : "Start recording"}
         className={twMerge(
-          "relative z-10 flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full transition-all duration-500 transform shadow-2xl focus:outline-none",
+          "relative z-10 flex items-center justify-center w-20 h-20 sm:w-28 sm:h-28 rounded-full transition-all duration-500 transform shadow-2xl focus:outline-none",
           isRecording 
             ? "bg-gradient-to-br from-rose-500 to-orange-600 shadow-rose-500/40 scale-100" 
-            : "bg-gradient-to-br from-primary via-primary-hover to-teal-900 shadow-primary/40 animate-breathe hover:scale-105",
+            : "bg-gradient-to-br from-primary via-primary-hover to-teal-900 shadow-primary/40 animate-pulse-slow hover:scale-[1.03]",
           disabled && "opacity-50 grayscale cursor-not-allowed transform-none hover:scale-100 animate-none"
         )}
       >
@@ -86,7 +86,7 @@ const RecordButton: React.FC<RecordButtonProps> = ({
 
       {/* Floating Label */}
       <span className={twMerge(
-        "text-[9px] sm:text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 bg-white/60 backdrop-blur-xl px-3 sm:px-4 py-1.5 rounded-full border border-white/50 shadow-sm",
+        "text-[9px] sm:text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 bg-surface-panel/80 backdrop-blur-xl px-3 sm:px-4 py-1.5 rounded-full border border-stone-100/70 shadow-sm",
         isRecording ? "text-rose-500 border-rose-100 translate-y-2" : "text-text-muted border-stone-100"
       )}>
         {isRecording ? "Listening..." : "Tap to Speak"}

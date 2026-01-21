@@ -17,22 +17,22 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/30 backdrop-blur-md animate-in fade-in duration-300 cursor-pointer"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/25 backdrop-blur-md animate-in fade-in duration-300 cursor-pointer"
       onClick={onClose}
     >
       <div 
-        className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 border border-white/40 ring-1 ring-white/50 cursor-auto flex flex-col max-h-[90vh]"
+        className="bg-surface-panel/95 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-8 duration-300 border border-stone-100/70 ring-1 ring-black/5 cursor-auto flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex-none flex items-center justify-between p-6 sm:p-8 pb-4 sm:pb-6 border-b border-stone-100/50 bg-white/50">
+        <div className="flex-none flex items-center justify-between p-6 sm:p-8 pb-4 sm:pb-6 border-b border-stone-100/50 bg-surface-panel/70">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-text-strong tracking-tight">Preferences</h2>
             <p className="text-xs sm:text-sm text-text-soft font-medium">Personalize your tutor</p>
           </div>
           <button 
             onClick={onClose} 
-            className="p-2.5 text-text-muted hover:text-text-strong hover:bg-white rounded-full transition-all border border-transparent hover:border-stone-200 hover:shadow-sm"
+            className="p-2.5 text-text-muted hover:text-text-strong hover:bg-surface-panel/90 rounded-full transition-all border border-transparent hover:border-stone-200/80 hover:shadow-sm"
             aria-label="Close"
           >
             <X size={20} />
@@ -40,7 +40,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
         </div>
         
         {/* Scrollable Content */}
-        <div className="flex-1 p-6 sm:p-8 space-y-8 sm:space-y-10 bg-surface-background/30 overflow-y-auto">
+        <div className="flex-1 p-6 sm:p-8 space-y-8 sm:space-y-10 bg-surface-background/40 overflow-y-auto">
           
           {/* Language Selection */}
           <div className="space-y-4">
@@ -58,7 +58,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                     className={`flex-none snap-center px-6 py-4 text-sm font-bold rounded-2xl border transition-all duration-200 shadow-sm min-w-[100px] flex items-center justify-center ${
                       isSelected 
                         ? 'border-secondary bg-secondary/10 text-secondary ring-1 ring-secondary/20' 
-                        : 'border-white bg-white/80 text-text-soft hover:border-stone-200 hover:bg-white'
+                        : 'border-stone-100/70 bg-surface-panel/90 text-text-soft hover:border-stone-200/80 hover:bg-surface-panel/95'
                     }`}
                   >
                     {lang}
@@ -74,7 +74,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
               <KeyRound size={14} className="text-primary" />
               Gemini API Key
             </label>
-            <div className="bg-white/80 p-4 rounded-[1.25rem] border border-stone-100/80 shadow-sm">
+            <div className="bg-surface-panel/90 p-4 rounded-[1.25rem] border border-stone-100/70 shadow-sm">
               <input
                 type="password"
                 placeholder="Paste your API key"
@@ -105,7 +105,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
               <User size={14} className="text-secondary" />
               Your Name
             </label>
-            <div className="bg-white/80 p-4 rounded-[1.25rem] border border-stone-100/80 shadow-sm">
+            <div className="bg-surface-panel/90 p-4 rounded-[1.25rem] border border-stone-100/70 shadow-sm">
               <input
                 type="text"
                 placeholder="How should I address you?"
@@ -138,7 +138,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                     className={`relative px-4 py-4 text-sm font-bold rounded-2xl border transition-all duration-200 flex items-center justify-center shadow-sm ${
                       isSelected 
                         ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/20' 
-                        : 'border-white bg-white/80 text-text-soft hover:border-stone-200 hover:bg-white'
+                        : 'border-stone-100/70 bg-surface-panel/90 text-text-soft hover:border-stone-200/80 hover:bg-surface-panel/95'
                     }`}
                   >
                     {voice}
@@ -167,7 +167,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                     className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all duration-200 shadow-sm ${
                       isSelected
                         ? 'border-secondary bg-secondary/10 text-secondary ring-1 ring-secondary/20'
-                        : 'border-white bg-white/80 text-text-soft hover:border-stone-200 hover:bg-white'
+                        : 'border-stone-100/70 bg-surface-panel/90 text-text-soft hover:border-stone-200/80 hover:bg-surface-panel/95'
                     }`}
                   >
                     {goal}
@@ -183,7 +183,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
               <Zap size={14} className="text-secondary" />
               Speaking Pace
             </label>
-            <div className="bg-white/80 p-6 rounded-[1.5rem] border border-stone-100/80 shadow-sm">
+            <div className="bg-surface-panel/90 p-6 rounded-[1.5rem] border border-stone-100/70 shadow-sm">
               <div className="flex items-center justify-between mb-6">
                 <span className="text-[10px] text-text-muted font-bold tracking-wide uppercase">Relaxed</span>
                 <span className="text-xl font-bold text-secondary font-mono bg-secondary/10 px-4 py-1 rounded-xl">{settings.speechSpeed}x</span>
@@ -205,7 +205,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
           </div>
 
           {/* Native Mode Toggle */}
-          <div className="flex items-center justify-between p-5 bg-white/80 rounded-[1.5rem] border border-stone-100/80 shadow-sm hover:shadow-card transition-all">
+          <div className="flex items-center justify-between p-5 bg-surface-panel/90 rounded-[1.5rem] border border-stone-100/70 shadow-sm hover:shadow-card transition-all">
             <div className="flex items-center gap-4">
               <div className={`p-3.5 rounded-2xl transition-colors duration-300 ${settings.nativeMode ? 'bg-emerald-50 text-emerald-600' : 'bg-stone-100 text-stone-400'}`}>
                  <Zap size={20} />
@@ -246,7 +246,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                     className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all duration-200 shadow-sm ${
                       isSelected
                         ? 'border-secondary bg-secondary/10 text-secondary ring-1 ring-secondary/20'
-                        : 'border-white bg-white/80 text-text-soft hover:border-stone-200 hover:bg-white'
+                        : 'border-stone-100/70 bg-surface-panel/90 text-text-soft hover:border-stone-200/80 hover:bg-surface-panel/95'
                     }`}
                   >
                     {accent}
@@ -280,7 +280,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                 key: "noiseGuard"
               }
             ].map((item) => (
-              <div key={item.key} className="flex items-center justify-between p-4 bg-white/80 rounded-[1.25rem] border border-stone-100/80 shadow-sm">
+              <div key={item.key} className="flex items-center justify-between p-4 bg-surface-panel/90 rounded-[1.25rem] border border-stone-100/70 shadow-sm">
                 <div className="flex flex-col">
                   <span className="font-bold text-text-strong text-sm">{item.label}</span>
                   <span className="text-[11px] text-text-muted font-medium mt-0.5">{item.desc}</span>
@@ -303,7 +303,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
         </div>
         
         {/* Footer */}
-        <div className="flex-none p-6 bg-stone-50/50 border-t border-stone-100/50 flex items-center justify-between backdrop-blur-sm">
+        <div className="flex-none p-6 bg-surface-panel/80 border-t border-stone-100/60 flex items-center justify-between backdrop-blur-sm">
             <button 
               onClick={() => {
                 onChangeSettings({
@@ -328,7 +328,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
 
             <button
               onClick={onClose}
-              className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-primary/30 transition-all hover:scale-[1.02] active:scale-95"
             >
               <Check size={16} strokeWidth={3} />
               <span>Done</span>

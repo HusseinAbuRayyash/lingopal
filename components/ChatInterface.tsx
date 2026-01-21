@@ -34,7 +34,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages, isLoading]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-6 w-full max-w-xl md:max-w-2xl mx-auto scroll-smooth no-scrollbar pb-28 sm:pb-36 mask-image-b">
+    <div className="flex-1 overflow-y-auto px-3 sm:px-6 w-full max-w-xl md:max-w-2xl mx-auto scroll-smooth no-scrollbar pb-[calc(env(safe-area-inset-bottom)+8rem)] sm:pb-36 mask-image-b">
       
       {messages.length === 0 ? (
         <div className="h-full flex flex-col items-center justify-center text-center space-y-8 sm:space-y-10 animate-fade-in-up pb-8 sm:pb-10">
@@ -42,9 +42,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           {/* Hero Emoji & Halo */}
           <div className="relative">
             {/* Breathing Halo */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-48 sm:h-48 bg-primary-glow/20 rounded-full blur-3xl animate-breathe"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-48 sm:h-48 bg-primary-glow/15 rounded-full blur-3xl animate-breathe"></div>
             
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 bg-gradient-to-b from-white to-stone-50 rounded-full shadow-gem flex items-center justify-center border border-white/60 backdrop-blur-sm animate-float">
+            <div className="relative w-28 h-28 sm:w-36 sm:h-36 bg-gradient-to-b from-white to-stone-50 rounded-full shadow-gem flex items-center justify-center border border-white/60 backdrop-blur-sm">
               <span className="text-6xl sm:text-7xl drop-shadow-sm animate-wave origin-bottom-right cursor-default select-none">👋</span>
             </div>
           </div>
@@ -85,7 +85,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           
           {isLoading && (
             <div className="flex justify-start animate-fade-in-up">
-              <div className="bg-white/80 backdrop-blur px-5 py-4 rounded-3xl rounded-tl-sm shadow-soft border border-white/60 flex items-center gap-3">
+              <div className="bg-surface-panel/90 backdrop-blur px-5 py-4 rounded-3xl rounded-tl-sm shadow-soft border border-stone-100/70 flex items-center gap-3">
                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                  <span className="text-sm text-text-soft font-medium font-sans">Thinking...</span>
               </div>
