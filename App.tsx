@@ -40,6 +40,23 @@ function App() {
   const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
   const [audioUnlockRequired, setAudioUnlockRequired] = useState(false);
+  const coachPhrases = [
+    "You're improving fast — keep going.",
+    "Good energy. Let's polish it.",
+    "Almost there — just a small tweak.",
+    "Nice effort. You're on the right track.",
+    "That was brave — let's tighten it up.",
+    "Solid attempt. You're close.",
+    "We're getting it. One more try.",
+    "You're doing great. Keep the rhythm."
+  ];
+  const repeatPhrases = [
+    "Say it with me:",
+    "Try this:",
+    "Here it is:",
+    "Let's say it:",
+    "Give this a go:"
+  ];
   const humorPhrases = [
     "Your brain is buffering — totally normal.",
     "Close enough to fool a tourist — almost.",
@@ -47,6 +64,7 @@ function App() {
     "If language were coffee, you're at a solid espresso."
   ];
   const getRandom = (items: string[]) => items[Math.floor(Math.random() * items.length)];
+  const maybeHumor = () => (Math.random() < 0.25 ? getRandom(humorPhrases) : null);
 
   // --- Refs ---
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
