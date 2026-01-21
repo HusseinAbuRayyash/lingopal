@@ -37,7 +37,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <div className="flex-1 overflow-y-auto px-3 sm:px-6 w-full max-w-xl md:max-w-2xl mx-auto scroll-smooth no-scrollbar pb-28 sm:pb-36 mask-image-b">
       
       {messages.length === 0 ? (
-        <div className="h-full flex flex-col items-center justify-center text-center space-y-8 sm:space-y-10 animate-fade-in-up pb-8 sm:pb-10">
+        <div className="h-full flex flex-col items-center justify-center text-center space-y-7 sm:space-y-9 animate-fade-in-up pb-8 sm:pb-10">
           
           {/* Hero Emoji & Halo */}
           <div className="relative">
@@ -50,19 +50,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </div>
           
           {/* Text Block */}
-          <div className="max-w-sm space-y-3 relative z-10">
-            <h3 className="text-4xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary font-sans tracking-tight pb-2 leading-tight animate-pulse-slow">
+          <div className="max-w-md space-y-3 relative z-10">
+            <h3 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary font-sans tracking-tight pb-2 leading-tight animate-pulse-slow">
               LingoPal
             </h3>
-            <p className="text-primary font-medium tracking-wide text-base sm:text-lg">
+            <p className="text-primary/80 font-medium tracking-wide text-base sm:text-lg">
               Your partner in mastering languages.
             </p>
-             <span className="inline-block px-3 py-1 bg-secondary/10 text-secondary text-xs font-bold uppercase tracking-widest rounded-full border border-secondary/20">
+             <span className="inline-block px-3 py-1 bg-gradient-to-r from-secondary-soft via-accent-soft to-info-soft text-secondary/90 text-xs font-bold uppercase tracking-widest rounded-full border border-secondary/30 animate-pulse-slow">
                Learning: {targetLanguage}
              </span>
-            <p className="text-text-muted text-xs sm:text-sm pt-3 sm:pt-4">
-              Tap the button below to start conversation.
-            </p>
           </div>
         </div>
       ) : (
@@ -85,7 +82,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           
           {isLoading && (
             <div className="flex justify-start animate-fade-in-up">
-              <div className="bg-white/80 backdrop-blur px-5 py-4 rounded-3xl rounded-tl-sm shadow-soft border border-white/60 flex items-center gap-3">
+              <div className="bg-surface-glass backdrop-blur px-5 py-4 rounded-3xl rounded-tl-sm shadow-soft border border-white/60 flex items-center gap-3">
                  <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
                  <span className="text-sm text-text-soft font-medium font-sans">Thinking...</span>
               </div>

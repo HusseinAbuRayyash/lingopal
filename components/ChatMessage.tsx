@@ -90,20 +90,20 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     return (
       <div className="flex justify-end mb-6 group animate-fade-in-up">
         <div className="relative max-w-[90%] sm:max-w-[75%]">
-           <div className="bg-gradient-to-br from-primary to-teal-600 text-white rounded-2xl rounded-tr-sm px-4 sm:px-6 py-3 sm:py-4 shadow-md shadow-primary/10 border border-white/10 relative overflow-hidden transition-transform hover:scale-[1.01] duration-300">
+           <div className="bg-gradient-to-br from-primary to-primary-hover text-white rounded-2xl rounded-tr-sm px-4 sm:px-6 py-3 sm:py-4 shadow-md shadow-primary/10 border border-white/10 relative overflow-hidden transition-transform hover:scale-[1.01] duration-300">
              {/* Subtle noise texture */}
              <div className="absolute inset-0 opacity-5 bg-black mix-blend-overlay pointer-events-none"></div>
              
              <p className="text-base sm:text-lg leading-relaxed font-sans font-medium relative z-10">{message.transcript?.transcript}</p>
              {/* Only show transliteration if it's available and not redundant */}
              {message.transcript?.transliteration && message.transcript.transliteration !== message.transcript.transcript && (
-                <p className="text-sm text-teal-100/90 mt-2 italic font-light border-t border-white/20 pt-2 inline-block relative z-10 font-serif">
+                <p className="text-sm text-primary-light/90 mt-2 italic font-light border-t border-white/20 pt-2 inline-block relative z-10 font-serif">
                   {message.transcript.transliteration}
                 </p>
              )}
            </div>
            {/* Tiny tail hint */}
-           <div className="absolute top-0 -right-1 w-2 h-2 bg-teal-600 rounded-bl-full"></div>
+           <div className="absolute top-0 -right-1 w-2 h-2 bg-primary-hover rounded-bl-full"></div>
         </div>
       </div>
     );
@@ -116,11 +116,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <div className="flex justify-start mb-8 animate-fade-in-up">
       {/* Container - Premium Glass Card */}
-      <div className="max-w-[96%] sm:max-w-[90%] w-full bg-white/90 backdrop-blur-md border border-stone-100 rounded-[2rem] rounded-tl-sm p-1 shadow-sm ring-1 ring-black/5 relative overflow-hidden group">
+      <div className="max-w-[96%] sm:max-w-[90%] w-full bg-surface-glass backdrop-blur-md border border-stone-100 rounded-[2rem] rounded-tl-sm p-1 shadow-sm ring-1 ring-black/5 relative overflow-hidden group">
         
         {/* Soft background ambient gradient */}
-        <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-radial from-amber-50/60 to-transparent opacity-60 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-gradient-radial from-primary/5 to-transparent opacity-60 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-2/3 h-2/3 bg-gradient-radial from-secondary-soft/70 to-transparent opacity-60 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-gradient-radial from-primary-soft/70 to-transparent opacity-60 pointer-events-none"></div>
 
         <div className="p-4 sm:p-8 relative z-10">
           {/* Header Row */}
@@ -251,7 +251,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
             </div>
 
             {/* 3. Translation / Transcription Card (Paper Style) */}
-            <div className="bg-gradient-to-br from-primary/5 via-white to-secondary/5 rounded-2xl p-4 sm:p-6 border border-primary/10 relative group/trans hover:from-primary/10 hover:to-secondary/10 transition-colors">
+            <div className="bg-gradient-to-br from-primary-soft/60 via-white to-secondary-soft/60 rounded-2xl p-4 sm:p-6 border border-primary/10 relative group/trans hover:from-primary-soft/80 hover:to-secondary-soft/80 transition-colors">
                <button 
                   onClick={() => navigator.clipboard.writeText(targetLanguage === 'English' ? data.userTranscript : data.englishTranslation)}
                   className="absolute top-3 right-3 text-stone-300 hover:text-stone-500 transition-colors opacity-0 group-hover/trans:opacity-100"
@@ -317,12 +317,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
             {/* 5. Cultural Notes (Golden Sidebar) */}
             {data.culturalNotes.length > 0 && (
-              <div className="bg-gradient-to-r from-amber-50/60 to-transparent rounded-r-2xl border-l-[3px] border-amber-400 p-5 relative overflow-hidden">
-                <span className="block text-[10px] font-bold text-amber-600/80 uppercase tracking-[0.2em] mb-2">Cultural Insight</span>
+              <div className="bg-gradient-to-r from-secondary-soft/70 to-transparent rounded-r-2xl border-l-[3px] border-secondary p-5 relative overflow-hidden">
+                <span className="block text-[10px] font-bold text-secondary/80 uppercase tracking-[0.2em] mb-2">Cultural Insight</span>
                 <ul className="space-y-2">
                   {data.culturalNotes.map((note, i) => (
                     <li key={i} className="text-sm text-text-main leading-relaxed flex gap-2">
-                       <span className="text-amber-400 mt-1.5">•</span>
+                       <span className="text-secondary mt-1.5">•</span>
                        <span>{note}</span>
                     </li>
                   ))}

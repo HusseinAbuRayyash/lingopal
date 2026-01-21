@@ -78,6 +78,7 @@ function App() {
   const isLoadingRef = useRef(false);
   const shadowStartTimeoutRef = useRef<number | null>(null);
   const vocabAudioCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
+  const ttsQuotaExceededRef = useRef(false);
   
   // VAD Refs
   const vadIntervalRef = useRef<number | null>(null);
@@ -104,7 +105,10 @@ function App() {
 
   useEffect(() => {
     const handleUserGesture = async () => {
-      await unlockAudioContext();
+      const unlocked = await unlockAudioContext();
+      if (!unlocked) {
+        setAudioUnlockRequired(true);
+      }
       tryPlayPending();
     };
     window.addEventListener('pointerdown', handleUserGesture);
@@ -166,38 +170,83 @@ function App() {
     osc.stop(now + durationMs / 1000);
   };
 
-  const unlockAudioContext = async () => {
+  const unlockAudioContext = async (): Promise<boolean> => {
     const ctx = ensureAudioContext();
-    if (!ctx) return;
+    if (!ctx) return false;
     if (ctx.state === 'suspended') {
       try {
         await ctx.resume();
       } catch (e) {
-        // Ignore resume failures; playback will fallback to manual tap.
+        console.warn("Failed to resume AudioContext:", e);
+        return false;
       }
     }
-    // Play a near-silent tick to unlock autoplay on some browsers.
-    try {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.frequency.value = 30;
-      gain.gain.value = 0.0001;
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      const now = ctx.currentTime;
-      osc.start(now);
-      osc.stop(now + 0.02);
-    } catch (e) {
-      // No-op
-    }
+    // Play a near-silent tick to unlock autoplay on some browsers and wait for it.
+    return new Promise<boolean>((resolve) => {
+      try {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = 30;
+        gain.gain.value = 0.0001;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+        osc.onended = () => resolve(true);
+        osc.start(now);
+        osc.stop(now + 0.02);
+        // Fallback in case onended doesn't fire
+        setTimeout(() => resolve(ctx.state === 'running'), 100);
+      } catch (e) {
+        console.warn("Audio unlock failed:", e);
+        resolve(false);
+      }
+    });
   };
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+  const isQuotaError = (error: unknown) => {
+    const message = error instanceof Error ? error.message : String(error);
+    return message.includes("RESOURCE_EXHAUSTED") || message.toLowerCase().includes("quota");
+  };
+
+  const speakWithBrowser = async (text: string, msgId?: string, rateOverride?: number) => {
+    if (!('speechSynthesis' in window)) return false;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = rateOverride ?? settings.speechSpeed;
+      if (msgId) {
+        setCurrentlyPlayingId(msgId);
+      }
+      return await new Promise<boolean>((resolve) => {
+        utterance.onend = () => {
+          if (msgId) setCurrentlyPlayingId(null);
+          resolve(true);
+        };
+        utterance.onerror = () => {
+          if (msgId) setCurrentlyPlayingId(null);
+          resolve(false);
+        };
+        window.speechSynthesis.speak(utterance);
+      });
+    } catch (e) {
+      if (msgId) setCurrentlyPlayingId(null);
+      return false;
+    }
+  };
+
   const generateSpeechWithRetry = async (text: string, retries: number = 1) => {
     try {
+      if (ttsQuotaExceededRef.current) {
+        throw new Error("TTS quota exceeded");
+      }
       return await generateSpeech(text, settings.voiceName, apiKey);
     } catch (error) {
+      if (isQuotaError(error)) {
+        ttsQuotaExceededRef.current = true;
+        throw error;
+      }
       if (retries <= 0) throw error;
       await sleep(400);
       return generateSpeechWithRetry(text, retries - 1);
@@ -418,9 +467,12 @@ function App() {
   const getVocabCacheKey = (term: string) => `${settings.voiceName}::${term}`;
   const prefetchVocabAudio = async (vocab: VocabularyItem[]) => {
     if (!apiKey || vocab.length === 0) return;
+    if (ttsQuotaExceededRef.current) return;
+    if (isRecordingRef.current || isLoadingRef.current) return;
     const ctx = ensureAudioContext();
     if (!ctx) return;
-    for (const item of vocab) {
+    const limited = vocab.slice(0, 1);
+    for (const item of limited) {
       const key = getVocabCacheKey(item.term);
       if (vocabAudioCacheRef.current.has(key)) continue;
       try {
@@ -428,12 +480,21 @@ function App() {
         const buffer = await decodeAudioData(audioBase64, ctx);
         vocabAudioCacheRef.current.set(key, buffer);
       } catch (e) {
+        if (isQuotaError(e)) {
+          ttsQuotaExceededRef.current = true;
+          return;
+        }
         // ignore prefetch errors
       }
     }
   };
 
-  const tryPlayPending = () => {
+  const tryPlayPending = (retryCount: number = 0) => {
+    if (retryCount > 20) {
+      console.warn("Gave up trying to play pending audio");
+      setAudioUnlockRequired(true);
+      return;
+    }
     const pendingId = pendingAutoPlayQueueRef.current[0];
     if (!pendingId) return;
     const msg = messagesRef.current.find(m => m.id === pendingId);
@@ -443,12 +504,12 @@ function App() {
           pendingAutoPlayQueueRef.current.shift();
         } else {
           setAudioUnlockRequired(true);
-          setTimeout(tryPlayPending, 250);
+          setTimeout(() => tryPlayPending(retryCount + 1), 250);
         }
       });
       return;
     }
-    setTimeout(tryPlayPending, 250);
+    setTimeout(() => tryPlayPending(retryCount + 1), 250);
   };
 
   // --- Recording Handlers ---
@@ -570,7 +631,7 @@ function App() {
     }
     await unlockAudioContext();
     if (pendingAutoPlayQueueRef.current.length > 0) {
-      setTimeout(tryPlayPending, 250);
+      setTimeout(() => tryPlayPending(1), 250);
     }
   };
 
@@ -667,24 +728,9 @@ function App() {
       setIsLoading(false); // Stop "Thinking" spinner so user can read
       void prefetchVocabAudio(responseData.vocabulary);
 
+      // 3. Generate Audio in Background
+      const ttsText = responseData.targetText;
       try {
-        // 3. Generate Audio in Background
-        const ttsText =
-          responseData.feedback?.hasError
-            ? [
-                responseData.feedback.correction
-                  ? `I heard you say: ${responseData.userTranscript}. Try: ${responseData.feedback.correction}.`
-                  : `I heard you say: ${responseData.userTranscript}.`,
-                responseData.feedback.explanation
-                  ? `${responseData.feedback.explanation}.`
-                  : null,
-                `${getRandom(repeatPhrases)} ${responseData.targetText}.`,
-                maybeHumor(),
-                getRandom(coachPhrases)
-              ]
-                .filter(Boolean)
-                .join(" ")
-            : responseData.targetText;
         const audioBase64 = await generateSpeechWithRetry(ttsText);
         const ctx = ensureAudioContext();
         if (ctx) {
@@ -697,11 +743,14 @@ function App() {
              }
              return m;
            }));
-          await unlockAudioContext();
+          const unlocked = await unlockAudioContext();
+          if (!unlocked) {
+            setAudioUnlockRequired(true);
+          }
           const played = await playMessageAudio(botMsgId, buffer, paceOverride);
           if (!played) {
             setAudioUnlockRequired(true);
-            setTimeout(tryPlayPending, 250);
+            setTimeout(() => tryPlayPending(1), 250);
           } else {
             setAudioUnlockRequired(false);
             if (pendingAutoPlayQueueRef.current[0] === botMsgId) {
@@ -711,6 +760,10 @@ function App() {
         }
       } catch (ttsError) {
         console.error("TTS failed", ttsError);
+        if (isQuotaError(ttsError)) {
+          pendingAutoPlayQueueRef.current = pendingAutoPlayQueueRef.current.filter(id => id !== botMsgId);
+          await speakWithBrowser(ttsText, botMsgId, paceOverride);
+        }
       }
 
     } catch (error) {
@@ -739,9 +792,15 @@ function App() {
     if (!ctx) return false;
 
     if (ctx.state === 'suspended') {
-      await ctx.resume();
+      try {
+        await ctx.resume();
+        await sleep(50);
+      } catch (e) {
+        console.warn("Failed to resume AudioContext:", e);
+      }
     }
     if (ctx.state !== 'running') {
+      console.warn(`AudioContext not running (state: ${ctx.state})`);
       if (!pendingAutoPlayQueueRef.current.includes(msgId)) {
         pendingAutoPlayQueueRef.current.push(msgId);
       }
@@ -865,22 +924,22 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] overflow-hidden bg-surface-background relative selection:bg-primary-light font-sans">
+    <div className="flex flex-col h-[100dvh] overflow-hidden bg-transparent relative selection:bg-primary-light font-sans">
       {/* Living Mesh Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-         <div className="noise-bg absolute inset-0 z-10 pointer-events-none mix-blend-multiply opacity-50"></div>
-         <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-primary-light/30 rounded-full blur-[100px] opacity-60 animate-float"></div>
-         <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary-soft/50 rounded-full blur-[100px] opacity-50 animate-float" style={{ animationDelay: '3s' }}></div>
-         <div className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-white rounded-full blur-[80px] opacity-40 animate-breathe"></div>
+         <div className="noise-bg absolute inset-0 z-10 pointer-events-none mix-blend-multiply opacity-35"></div>
+         <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-primary-light/25 rounded-full blur-[110px] opacity-50 animate-float"></div>
+         <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary-soft/45 rounded-full blur-[110px] opacity-45 animate-float" style={{ animationDelay: '3s' }}></div>
+         <div className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-white rounded-full blur-[90px] opacity-30 animate-breathe"></div>
       </div>
       
       {/* Floating Glass Header */}
-      <header className="flex-none absolute top-[calc(env(safe-area-inset-top)+0.5rem)] sm:top-4 left-0 right-0 z-30 flex justify-center pointer-events-none">
-        <div className="pointer-events-auto flex items-center justify-between gap-4 px-3 py-2 rounded-full bg-white/50 backdrop-blur-xl shadow-soft border border-white/60 w-[90%] max-w-lg transition-all hover:bg-white/70 hover:shadow-md">
+      <header className="flex-none absolute top-[calc(env(safe-area-inset-top)+0.4rem)] sm:top-3 left-0 right-0 z-30 flex justify-center pointer-events-none">
+        <div className="pointer-events-auto flex items-center justify-between gap-4 px-3 py-1.5 rounded-full bg-surface-glass backdrop-blur-xl shadow-soft border border-white/60 w-[90%] max-w-lg transition-all hover:bg-white/70 hover:shadow-md">
           
           {/* Logo Badge */}
           <div className="flex items-center gap-2 pl-1">
-             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-glow to-primary flex items-center justify-center text-white shadow-glow ring-2 ring-white">
+             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary via-info to-secondary flex items-center justify-center text-white shadow-glow ring-2 ring-white">
                <Sparkles size={14} className="animate-pulse-slow" />
              </div>
             <span className="text-sm font-extrabold font-sans tracking-tight hidden sm:block bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-pulse-slow">
@@ -888,7 +947,7 @@ function App() {
             </span>
           </div>
 
-          <div className="h-4 w-px bg-stone-300/50 mx-1"></div>
+          <div className="h-4 w-px bg-gradient-to-b from-black/10 via-black/25 to-black/10 mx-1"></div>
 
           {/* Settings Trigger */}
           <div className="flex items-center gap-1">
@@ -913,7 +972,7 @@ function App() {
 
       {apiKeyMissing && (
         <div className="absolute top-20 left-0 right-0 z-20 flex justify-center px-4">
-          <div className="pointer-events-auto flex items-center gap-3 bg-white/90 border border-red-100 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong">
+          <div className="pointer-events-auto flex items-center gap-3 bg-surface-glass border border-red-100 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong">
             <AlertTriangle size={16} className="text-red-500" />
             <span>Gemini API key required to start.</span>
             <button
@@ -929,11 +988,11 @@ function App() {
         <div className="absolute top-20 left-0 right-0 z-20 flex justify-center px-4 mt-14">
           <button
             onClick={async () => {
-              await unlockAudioContext();
+              const unlocked = await unlockAudioContext();
               tryPlayPending();
-              setAudioUnlockRequired(false);
+              setAudioUnlockRequired(!unlocked);
             }}
-            className="pointer-events-auto flex items-center gap-2 bg-white/90 border border-stone-200 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong hover:border-primary/30"
+            className="pointer-events-auto flex items-center gap-2 bg-surface-glass border border-stone-200 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong hover:border-primary/30"
           >
             Enable audio
           </button>
@@ -941,7 +1000,7 @@ function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col relative z-10 h-full pt-20">
+      <main className="flex-1 flex flex-col relative z-10 h-full pt-16">
         <ChatInterface 
           messages={messages} 
           isLoading={isLoading} 
