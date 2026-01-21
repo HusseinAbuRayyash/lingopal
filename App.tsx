@@ -40,6 +40,13 @@ function App() {
   const [currentlyPlayingId, setCurrentlyPlayingId] = useState<string | null>(null);
   const [volumeLevel, setVolumeLevel] = useState<number>(0);
   const [audioUnlockRequired, setAudioUnlockRequired] = useState(false);
+  const humorPhrases = [
+    "Your brain is buffering — totally normal.",
+    "Close enough to fool a tourist — almost.",
+    "That one had potential. We'll give it a remix.",
+    "If language were coffee, you're at a solid espresso."
+  ];
+  const getRandom = (items: string[]) => items[Math.floor(Math.random() * items.length)];
 
   // --- Refs ---
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
