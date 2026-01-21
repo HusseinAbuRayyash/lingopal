@@ -78,7 +78,6 @@ function App() {
   const isLoadingRef = useRef(false);
   const shadowStartTimeoutRef = useRef<number | null>(null);
   const vocabAudioCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
-  const ttsQuotaExceededRef = useRef(false);
   
   // VAD Refs
   const vadIntervalRef = useRef<number | null>(null);
@@ -105,10 +104,7 @@ function App() {
 
   useEffect(() => {
     const handleUserGesture = async () => {
-      const unlocked = await unlockAudioContext();
-      if (!unlocked) {
-        setAudioUnlockRequired(true);
-      }
+      await unlockAudioContext();
       tryPlayPending();
     };
     window.addEventListener('pointerdown', handleUserGesture);
@@ -170,83 +166,38 @@ function App() {
     osc.stop(now + durationMs / 1000);
   };
 
-  const unlockAudioContext = async (): Promise<boolean> => {
+  const unlockAudioContext = async () => {
     const ctx = ensureAudioContext();
-    if (!ctx) return false;
+    if (!ctx) return;
     if (ctx.state === 'suspended') {
       try {
         await ctx.resume();
       } catch (e) {
-        console.warn("Failed to resume AudioContext:", e);
-        return false;
+        // Ignore resume failures; playback will fallback to manual tap.
       }
     }
-    // Play a near-silent tick to unlock autoplay on some browsers and wait for it.
-    return new Promise<boolean>((resolve) => {
-      try {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.frequency.value = 30;
-        gain.gain.value = 0.0001;
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        const now = ctx.currentTime;
-        osc.onended = () => resolve(true);
-        osc.start(now);
-        osc.stop(now + 0.02);
-        // Fallback in case onended doesn't fire
-        setTimeout(() => resolve(ctx.state === 'running'), 100);
-      } catch (e) {
-        console.warn("Audio unlock failed:", e);
-        resolve(false);
-      }
-    });
+    // Play a near-silent tick to unlock autoplay on some browsers.
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = 30;
+      gain.gain.value = 0.0001;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+      osc.start(now);
+      osc.stop(now + 0.02);
+    } catch (e) {
+      // No-op
+    }
   };
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  const isQuotaError = (error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
-    return message.includes("RESOURCE_EXHAUSTED") || message.toLowerCase().includes("quota");
-  };
-
-  const speakWithBrowser = async (text: string, msgId?: string, rateOverride?: number) => {
-    if (!('speechSynthesis' in window)) return false;
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = rateOverride ?? settings.speechSpeed;
-      if (msgId) {
-        setCurrentlyPlayingId(msgId);
-      }
-      return await new Promise<boolean>((resolve) => {
-        utterance.onend = () => {
-          if (msgId) setCurrentlyPlayingId(null);
-          resolve(true);
-        };
-        utterance.onerror = () => {
-          if (msgId) setCurrentlyPlayingId(null);
-          resolve(false);
-        };
-        window.speechSynthesis.speak(utterance);
-      });
-    } catch (e) {
-      if (msgId) setCurrentlyPlayingId(null);
-      return false;
-    }
-  };
-
   const generateSpeechWithRetry = async (text: string, retries: number = 1) => {
     try {
-      if (ttsQuotaExceededRef.current) {
-        throw new Error("TTS quota exceeded");
-      }
       return await generateSpeech(text, settings.voiceName, apiKey);
     } catch (error) {
-      if (isQuotaError(error)) {
-        ttsQuotaExceededRef.current = true;
-        throw error;
-      }
       if (retries <= 0) throw error;
       await sleep(400);
       return generateSpeechWithRetry(text, retries - 1);
@@ -467,7 +418,6 @@ function App() {
   const getVocabCacheKey = (term: string) => `${settings.voiceName}::${term}`;
   const prefetchVocabAudio = async (vocab: VocabularyItem[]) => {
     if (!apiKey || vocab.length === 0) return;
-    if (ttsQuotaExceededRef.current) return;
     const ctx = ensureAudioContext();
     if (!ctx) return;
     for (const item of vocab) {
@@ -478,21 +428,12 @@ function App() {
         const buffer = await decodeAudioData(audioBase64, ctx);
         vocabAudioCacheRef.current.set(key, buffer);
       } catch (e) {
-        if (isQuotaError(e)) {
-          ttsQuotaExceededRef.current = true;
-          return;
-        }
         // ignore prefetch errors
       }
     }
   };
 
-  const tryPlayPending = (retryCount: number = 0) => {
-    if (retryCount > 20) {
-      console.warn("Gave up trying to play pending audio");
-      setAudioUnlockRequired(true);
-      return;
-    }
+  const tryPlayPending = () => {
     const pendingId = pendingAutoPlayQueueRef.current[0];
     if (!pendingId) return;
     const msg = messagesRef.current.find(m => m.id === pendingId);
@@ -502,12 +443,12 @@ function App() {
           pendingAutoPlayQueueRef.current.shift();
         } else {
           setAudioUnlockRequired(true);
-          setTimeout(() => tryPlayPending(retryCount + 1), 250);
+          setTimeout(tryPlayPending, 250);
         }
       });
       return;
     }
-    setTimeout(() => tryPlayPending(retryCount + 1), 250);
+    setTimeout(tryPlayPending, 250);
   };
 
   // --- Recording Handlers ---
@@ -629,7 +570,7 @@ function App() {
     }
     await unlockAudioContext();
     if (pendingAutoPlayQueueRef.current.length > 0) {
-      setTimeout(() => tryPlayPending(1), 250);
+      setTimeout(tryPlayPending, 250);
     }
   };
 
@@ -726,24 +667,24 @@ function App() {
       setIsLoading(false); // Stop "Thinking" spinner so user can read
       void prefetchVocabAudio(responseData.vocabulary);
 
-      // 3. Generate Audio in Background
-      const ttsText =
-        responseData.feedback?.hasError
-          ? [
-              responseData.feedback.correction
-                ? `I heard you say: ${responseData.userTranscript}. Try: ${responseData.feedback.correction}.`
-                : `I heard you say: ${responseData.userTranscript}.`,
-              responseData.feedback.explanation
-                ? `${responseData.feedback.explanation}.`
-                : null,
-              `${getRandom(repeatPhrases)} ${responseData.targetText}.`,
-              maybeHumor(),
-              getRandom(coachPhrases)
-            ]
-              .filter(Boolean)
-              .join(" ")
-          : responseData.targetText;
       try {
+        // 3. Generate Audio in Background
+        const ttsText =
+          responseData.feedback?.hasError
+            ? [
+                responseData.feedback.correction
+                  ? `I heard you say: ${responseData.userTranscript}. Try: ${responseData.feedback.correction}.`
+                  : `I heard you say: ${responseData.userTranscript}.`,
+                responseData.feedback.explanation
+                  ? `${responseData.feedback.explanation}.`
+                  : null,
+                `${getRandom(repeatPhrases)} ${responseData.targetText}.`,
+                maybeHumor(),
+                getRandom(coachPhrases)
+              ]
+                .filter(Boolean)
+                .join(" ")
+            : responseData.targetText;
         const audioBase64 = await generateSpeechWithRetry(ttsText);
         const ctx = ensureAudioContext();
         if (ctx) {
@@ -756,14 +697,11 @@ function App() {
              }
              return m;
            }));
-          const unlocked = await unlockAudioContext();
-          if (!unlocked) {
-            setAudioUnlockRequired(true);
-          }
+          await unlockAudioContext();
           const played = await playMessageAudio(botMsgId, buffer, paceOverride);
           if (!played) {
             setAudioUnlockRequired(true);
-            setTimeout(() => tryPlayPending(1), 250);
+            setTimeout(tryPlayPending, 250);
           } else {
             setAudioUnlockRequired(false);
             if (pendingAutoPlayQueueRef.current[0] === botMsgId) {
@@ -773,10 +711,6 @@ function App() {
         }
       } catch (ttsError) {
         console.error("TTS failed", ttsError);
-        if (isQuotaError(ttsError)) {
-          pendingAutoPlayQueueRef.current = pendingAutoPlayQueueRef.current.filter(id => id !== botMsgId);
-          await speakWithBrowser(ttsText, botMsgId, paceOverride);
-        }
       }
 
     } catch (error) {
@@ -805,15 +739,9 @@ function App() {
     if (!ctx) return false;
 
     if (ctx.state === 'suspended') {
-      try {
-        await ctx.resume();
-        await sleep(50);
-      } catch (e) {
-        console.warn("Failed to resume AudioContext:", e);
-      }
+      await ctx.resume();
     }
     if (ctx.state !== 'running') {
-      console.warn(`AudioContext not running (state: ${ctx.state})`);
       if (!pendingAutoPlayQueueRef.current.includes(msgId)) {
         pendingAutoPlayQueueRef.current.push(msgId);
       }
@@ -940,10 +868,10 @@ function App() {
     <div className="flex flex-col h-[100dvh] overflow-hidden bg-surface-background relative selection:bg-primary-light font-sans">
       {/* Living Mesh Background */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-         <div className="noise-bg absolute inset-0 z-10 pointer-events-none mix-blend-multiply opacity-40"></div>
-         <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-primary-light/20 rounded-full blur-[120px] opacity-45 animate-float"></div>
-         <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary-soft/40 rounded-full blur-[120px] opacity-40 animate-float" style={{ animationDelay: '3s' }}></div>
-         <div className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-white rounded-full blur-[100px] opacity-30 animate-breathe"></div>
+         <div className="noise-bg absolute inset-0 z-10 pointer-events-none mix-blend-multiply opacity-50"></div>
+         <div className="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-primary-light/30 rounded-full blur-[100px] opacity-60 animate-float"></div>
+         <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary-soft/50 rounded-full blur-[100px] opacity-50 animate-float" style={{ animationDelay: '3s' }}></div>
+         <div className="absolute top-[40%] left-[40%] w-[500px] h-[500px] bg-white rounded-full blur-[80px] opacity-40 animate-breathe"></div>
       </div>
       
       {/* Floating Glass Header */}
@@ -1001,9 +929,9 @@ function App() {
         <div className="absolute top-20 left-0 right-0 z-20 flex justify-center px-4 mt-14">
           <button
             onClick={async () => {
-              const unlocked = await unlockAudioContext();
+              await unlockAudioContext();
               tryPlayPending();
-              setAudioUnlockRequired(!unlocked);
+              setAudioUnlockRequired(false);
             }}
             className="pointer-events-auto flex items-center gap-2 bg-white/90 border border-stone-200 shadow-soft rounded-full px-4 py-2 text-sm text-text-strong hover:border-primary/30"
           >
@@ -1013,7 +941,7 @@ function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col relative z-10 h-full pt-16 sm:pt-20">
+      <main className="flex-1 flex flex-col relative z-10 h-full pt-20">
         <ChatInterface 
           messages={messages} 
           isLoading={isLoading} 

@@ -18,28 +18,27 @@
           extend: {
             colors: {
               primary: {
-                DEFAULT: '#0E6B64', // Ocean Teal (Deep)
-                hover: '#0C5A55',   // Teal 800
-                soft: '#ECF9F7',    // Teal 50
-                light: '#C6F5EE',   // Teal 100
-                glow: '#5ADBCF',    // Teal 300
+                DEFAULT: '#0F766E', // Ocean Teal (Deep)
+                hover: '#115E59',   // Teal 800
+                soft: '#F0FDFA',    // Teal 50
+                light: '#CCFBF1',   // Teal 100
+                glow: '#5EEAD4',    // Teal 300
               },
               secondary: {
-                DEFAULT: '#C56A12', // Desert Gold
-                hover: '#A9560F',   // Amber 700
-                soft: '#FFF5E6',    // Amber 50
+                DEFAULT: '#D97706', // Desert Gold
+                hover: '#B45309',   // Amber 700
+                soft: '#FFFBEB',    // Amber 50
               },
               surface: {
                 DEFAULT: '#FFFFFF',
-                background: '#F7F6F3', // Warm light
-                panel: '#FCFBFA',
-                glass: 'rgba(255, 255, 255, 0.7)',
+                background: '#FAFAF9', // Alabaster/Sand
+                glass: 'rgba(255, 255, 255, 0.6)',
               },
               text: {
-                strong: '#1E1A17', // Stone 900
-                main: '#3F3A35',   // Stone 700
-                soft: '#6F6761',   // Stone 500
-                muted: '#8E857E',  // Stone 400
+                strong: '#1C1917', // Stone 900
+                main: '#44403C',   // Stone 700
+                soft: '#78716C',   // Stone 500
+                muted: '#A8A29E',  // Stone 400
               }
             },
             fontFamily: {
@@ -48,21 +47,21 @@
               serif: ['Playfair Display', 'serif'],
             },
             boxShadow: {
-              'soft': '0 8px 28px -12px rgba(15, 23, 42, 0.18)',
-              'glow': '0 0 18px rgba(90, 219, 207, 0.45)',
-              'gem': 'inset 0 2px 4px rgba(255, 255, 255, 0.65), 0 10px 24px -8px rgba(14, 107, 100, 0.35)',
-              'card': '0 0 0 1px rgba(15, 23, 42, 0.04), 0 6px 18px rgba(15, 23, 42, 0.06)',
-              'convex': 'inset 0 1px 0 rgba(255,255,255,0.9), 0 3px 6px rgba(15, 23, 42, 0.08)',
-              'debossed': 'inset 0 2px 4px rgba(15, 23, 42, 0.08)',
-              'caustic': 'inset 0 2px 4px rgba(255, 255, 255, 0.45)',
+              'soft': '0 4px 30px -4px rgba(0, 0, 0, 0.05)',
+              'glow': '0 0 20px rgba(94, 234, 212, 0.5)',
+              'gem': 'inset 0 2px 4px rgba(255, 255, 255, 0.6), 0 8px 20px -4px rgba(13, 148, 136, 0.4)',
+              'card': '0 0 0 1px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.03)',
+              'convex': 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.05)',
+              'debossed': 'inset 0 2px 4px rgba(0,0,0,0.05)',
+              'caustic': 'inset 0 2px 4px rgba(255, 255, 255, 0.4)',
             },
             animation: {
               'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)',
-              'pulse-slow': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              'float': 'float 12s ease-in-out infinite',
-              'breathe': 'breathe 6s ease-in-out infinite',
-              'wave': 'wave 3.5s ease-in-out infinite',
-              'wave-bar': 'waveBar 1.4s ease-in-out infinite',
+              'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'float': 'float 8s ease-in-out infinite',
+              'breathe': 'breathe 5s ease-in-out infinite',
+              'wave': 'wave 2.5s ease-in-out infinite',
+              'wave-bar': 'waveBar 1s ease-in-out infinite',
               'rise': 'rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
             },
             keyframes: {
@@ -101,31 +100,7 @@
     </script>
     <style>
         .noise-bg {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-        }
-        button:focus-visible,
-        a:focus-visible,
-        input:focus-visible,
-        textarea:focus-visible,
-        select:focus-visible {
-            outline: 2px solid #5ADBCF;
-            outline-offset: 2px;
-        }
-        body {
-            -webkit-tap-highlight-color: transparent;
-        }
-        @media (max-width: 640px) {
-          input, textarea, select {
-            font-size: 16px;
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-            scroll-behavior: auto !important;
-          }
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
         }
     </style>
   <script type="importmap">
