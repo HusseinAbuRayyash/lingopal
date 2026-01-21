@@ -78,7 +78,6 @@ function App() {
   const isLoadingRef = useRef(false);
   const shadowStartTimeoutRef = useRef<number | null>(null);
   const vocabAudioCacheRef = useRef<Map<string, AudioBuffer>>(new Map());
-  const recordingMimeTypeRef = useRef<string | null>(null);
   
   // VAD Refs
   const vadIntervalRef = useRef<number | null>(null);
@@ -194,20 +193,6 @@ function App() {
   };
 
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  const pickRecordingMimeType = () => {
-    if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return null;
-    const candidates = [
-      'audio/webm;codecs=opus',
-      'audio/webm',
-      'audio/mp4',
-      'audio/aac'
-    ];
-    for (const type of candidates) {
-      if (MediaRecorder.isTypeSupported(type)) return type;
-    }
-    return null;
-  };
 
   const generateSpeechWithRetry = async (text: string, retries: number = 1) => {
     try {
@@ -482,14 +467,7 @@ function App() {
         playBeep(880, 120);
       }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (typeof MediaRecorder === 'undefined') {
-        throw new Error('MediaRecorder not supported');
-      }
-      const selectedMimeType = pickRecordingMimeType();
-      recordingMimeTypeRef.current = selectedMimeType;
-      const mediaRecorder = selectedMimeType
-        ? new MediaRecorder(stream, { mimeType: selectedMimeType })
-        : new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -509,11 +487,6 @@ function App() {
 
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      const message = error instanceof Error ? error.message : String(error);
-      if (message.includes('MediaRecorder not supported')) {
-        alert("Your browser doesn't support audio recording. Try Chrome on iOS/Android or update Safari.");
-        return;
-      }
       alert("Could not access microphone. Please ensure permissions are granted.");
     }
   };
@@ -608,10 +581,7 @@ function App() {
     
     if (audioChunksRef.current.length === 0) return;
 
-    const fallbackType = audioChunksRef.current[0]?.type || 'audio/webm';
-    const audioBlob = new Blob(audioChunksRef.current, {
-      type: recordingMimeTypeRef.current || fallbackType
-    });
+    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
     setIsLoading(true);
 
     try {
