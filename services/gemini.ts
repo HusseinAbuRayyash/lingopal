@@ -66,6 +66,7 @@ export async function analyzeAudioAndRespond(
   goal: string = 'Casual',
   nativeMode: boolean = false,
   accent: string = 'Neutral',
+  userName: string = '',
   apiKey?: string
 ): Promise<AIResponseData> {
   if (!apiKey) {
@@ -86,22 +87,30 @@ export async function analyzeAudioAndRespond(
     })
     .join('\n');
 
+  const trimmedName = userName.trim();
+  const nameHint = trimmedName ? `The learner's name is "${trimmedName}". Address them by name naturally in replies when appropriate (not every sentence).` : 'No name is provided.';
   const SYSTEM_PROMPT = `
     You are LingoPal, a friendly and fast language tutor teaching ${targetLanguage}.
     Teaching goal: ${goal}.
     Native mode: ${nativeMode ? 'ON (prefer natural, idiomatic phrasing and rhythm)' : 'OFF'}.
     Accent focus: ${accent}.
+    ${nameHint}
     
     Your Task:
     1. Listen to the user's input.
     2. **Detect Source Language:** Identify the user's spoken language (do not assume) and set 'sourceLanguage'.
     3. **Analyze for Mistakes:** Only check for errors if the user spoke ${targetLanguage} (including English). This includes grammar, vocabulary, structure, spelling, and **pronunciation** mistakes inferred from speech.
-    4. **Conversational Reply:** Reply naturally in ${targetLanguage}. **KEEP IT SHORT (max 1-2 sentences).** Speed is key.
+    4. **Conversational Reply:** If the user asks a question, include both the question and the answer in ${targetLanguage}, and add one short follow-up question to keep the conversation going. Use this format exactly:
+       Q: <user question in ${targetLanguage}>
+       A: <your answer in ${targetLanguage}>
+       <short follow-up question in ${targetLanguage}>
+       If it is not a question, reply naturally. **KEEP IT SHORT.** Speed is key.
     5. **Structured Feedback:** If error, populate 'feedback'.
     6. **Vocabulary:** Extract 1 to 6 key terms depending on the content (can be 0 if none).
 
     Guidelines:
     - If user speaks a different language than ${targetLanguage}, reply in ${targetLanguage} with translation.
+    - When the user asks a question, always include Q, A, and Follow-up as instructed.
     - Vocabulary must include important phrases: proverbs, idioms, slang, cultural references, or named expressions.
     - For each vocabulary item, include 'sourceTerm' (the term in the source language) and provide short example sentences in both the source language ('exampleSource') and the target language ('exampleTarget').
     - Set hasError: false unless it's a clear mistake.
@@ -109,6 +118,7 @@ export async function analyzeAudioAndRespond(
     - Keep 'targetText' very concise.
     - 'culturalNotes': Max 1 brief note or empty if irrelevant.
     - For languages using Latin script, 'transliteration' can match 'targetText'.
+    - If the user asks to repeat (e.g., "repeat", "again", or equivalent in other languages), respond by repeating the last target phrase only.
 
     Output MUST be valid JSON matching the schema.
   `;

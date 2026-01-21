@@ -3,7 +3,16 @@ export enum Sender {
   Bot = 'bot'
 }
 
-export type TargetLanguage = 'Arabic' | 'Spanish' | 'French' | 'German' | 'English';
+export type TargetLanguage =
+  | 'Arabic'
+  | 'Spanish'
+  | 'French'
+  | 'German'
+  | 'English'
+  | 'Chinese'
+  | 'Japanese'
+  | 'Latin'
+  | 'Russian';
 
 export interface VocabularyItem {
   term: string;             // Word or phrase in target language
@@ -65,6 +74,7 @@ export interface AppSettings {
   voiceName: string;      // TTS voice identifier
   speechSpeed: number;    // numeric speed multiplier
   apiKey: string;
+  userName: string;
   goal: LearningGoal;
   nativeMode: boolean;
   paceMatch: boolean;
@@ -75,7 +85,17 @@ export interface AppSettings {
 }
 
 export const AVAILABLE_VOICES = ["Zephyr", "Puck", "Charon", "Kore", "Fenrir"];
-export const AVAILABLE_LANGUAGES: TargetLanguage[] = ['Arabic', 'Spanish', 'French', 'German', 'English'];
+export const AVAILABLE_LANGUAGES: TargetLanguage[] = [
+  'Arabic',
+  'Spanish',
+  'French',
+  'German',
+  'English',
+  'Chinese',
+  'Japanese',
+  'Latin',
+  'Russian'
+];
 export type LearningGoal = 'Travel' | 'Business' | 'Casual' | 'Exam Prep' | 'Culture';
 export const AVAILABLE_GOALS: LearningGoal[] = ['Travel', 'Business', 'Casual', 'Exam Prep', 'Culture'];
 export type RephraseStyle = 'natural' | 'casual' | 'formal';
@@ -83,6 +103,13 @@ export type AccentPreset =
   | 'Neutral'
   | 'American'
   | 'British'
+  | 'Castilian Spanish'
+  | 'Mexican Spanish'
+  | 'Argentine Spanish'
+  | 'Colombian Spanish'
+  | 'Mandarin (Mainland)'
+  | 'Mandarin (Taiwan)'
+  | 'Cantonese'
   | 'Gulf Arabic'
   | 'Levantine Arabic'
   | 'Egyptian Arabic';
@@ -90,6 +117,13 @@ export const AVAILABLE_ACCENTS: AccentPreset[] = [
   'Neutral',
   'American',
   'British',
+  'Castilian Spanish',
+  'Mexican Spanish',
+  'Argentine Spanish',
+  'Colombian Spanish',
+  'Mandarin (Mainland)',
+  'Mandarin (Taiwan)',
+  'Cantonese',
   'Gulf Arabic',
   'Levantine Arabic',
   'Egyptian Arabic'

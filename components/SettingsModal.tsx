@@ -1,5 +1,5 @@
 import { AppSettings, AVAILABLE_VOICES, AVAILABLE_LANGUAGES, AVAILABLE_GOALS, AVAILABLE_ACCENTS } from '../types';
-import { X, Volume2, Zap, Check, Globe, KeyRound } from 'lucide-react';
+import { X, Volume2, Zap, Check, Globe, KeyRound, User } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -95,6 +95,29 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                   Google AI Studio
                 </a>
                 .
+              </p>
+            </div>
+          </div>
+
+          {/* Name */}
+          <div className="space-y-4">
+            <label className="flex items-center gap-2 text-[11px] font-bold text-text-muted uppercase tracking-widest">
+              <User size={14} className="text-secondary" />
+              Your Name
+            </label>
+            <div className="bg-white/80 p-4 rounded-[1.25rem] border border-stone-100/80 shadow-sm">
+              <input
+                type="text"
+                placeholder="How should I address you?"
+                value={settings.userName}
+                onChange={(e) => handleChange('userName', e.target.value)}
+                className="w-full bg-transparent text-sm text-text-strong placeholder:text-text-muted focus:outline-none"
+                autoComplete="off"
+                spellCheck={false}
+                maxLength={40}
+              />
+              <p className="text-[11px] text-text-muted mt-2">
+                Optional. Used to personalize responses.
               </p>
             </div>
           </div>
@@ -288,6 +311,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings
                   voiceName: 'Zephyr',
                   speechSpeed: 1.0,
                   apiKey: settings.apiKey,
+                  userName: '',
                   goal: 'Casual',
                   nativeMode: false,
                   paceMatch: false,
